@@ -1,0 +1,11 @@
+title: File2QR
+description: Converts your file(s) into a series of QR codes
+menu:
+  - title: Source code
+    url: "https://github.com/six-two/react-file2qr"
+    id: page-nav-source
+  - title: My other projects
+    url: "https://projects.six-two.dev/"
+    id: page-nav-projects
+pre_build:
+  - template-tools/defaults.py <PROJECT>
