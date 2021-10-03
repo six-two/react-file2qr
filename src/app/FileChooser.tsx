@@ -1,4 +1,3 @@
-import React from 'react';
 import { connect } from 'react-redux';
 import Files from 'react-files';
 import { ReduxState } from './redux/store';
@@ -25,21 +24,24 @@ const QRCodeImage = (props: Props) => {
 
     const onFilesError = (error: any, file: any) => {
         console.log('error code ' + error.code + ': ' + error.message)
-      };
+    };
 
-    return <Files
-    className='files-dropzone'
-    onChange={onFilesChange}
-    onError={onFilesError}
-    accepts={['image/png', '.pdf', 'audio/*']}
-    multiple
-    maxFiles={3}
-    maxFileSize={10000000}
-    minFileSize={0}
-    clickable
-  >
-    Drop files here or click to upload
-  </Files>
+    const text = props.file_name ?
+        `File uploaded: '${props.file_name}'. Drop a different file here or click here to change the file`
+        : "Drop a file here or click here to get started";
+
+    return <div>
+        <Files
+            className='files-dropzone'
+            onChange={onFilesChange}
+            onError={onFilesError}
+            multiple={false}
+            maxFileSize={10000000}
+            minFileSize={0}
+            clickable>
+            {text}
+        </Files>
+    </div>
 };
 
 interface Props {

@@ -1,9 +1,22 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Protocol idea
+
+
+
+QR contents:  version|hash|First QR extra headers?|data-offset|data
+First QR extra headers: file-byte-count
+
+version: int8 = 1
+hash: sha1?
+index: int16
+data-offset: int32
+file-byte-count: int32
+
 
 ## Available Scripts
 
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 In the project directory, you can run:
 
 ### `npm start`
