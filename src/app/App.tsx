@@ -1,6 +1,9 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import logo from '../logo.svg';
+import ErrorCorrectionLevelSetting from './ErrorCorrectionLevelSetting';
+import '../App.css';
+import QRCodeImage from './QRCodeImage';
+import FileChooser from './FileChooser';
 
 function App() {
   return (
@@ -18,6 +21,9 @@ function App() {
         >
           Learn React
         </a>
+        <FileChooser/>
+        <ErrorCorrectionLevelSetting />
+        <QRCodeImage />
       </header>
     </div>
   );
