@@ -1,3 +1,4 @@
+import { serializeFile } from '../encoders/QrHeaders';
 import * as Actions from './actions';
 import * as C from './constants';
 import {
@@ -29,6 +30,7 @@ export function reducer(state: ReduxState | undefined, action: Actions.Action): 
         ...state,
         file_name: payload.file_name,
         file_bytes: payload.file_bytes,
+        result_bytes: serializeFile(payload.file_name, payload.file_bytes),
       };
     }
     case C.SET_QR_DATA_URL: {

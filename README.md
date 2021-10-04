@@ -1,17 +1,30 @@
 # Getting Started with Create React App
 
+## TODO
+- Implement protocol
+- Write linux client, that can read QR codes and reconstruct the file
+
 ## Protocol idea
 
+Each QR code:
+version: int8
+hash (sha1): uint8array[20]
+offset: int32
 
+File payload:
+name: len_array
+contents: len_array
 
-QR contents:  version|hash|First QR extra headers?|data-offset|data
-First QR extra headers: file-byte-count
+len_array:
+length: int32
+data: uint8array
 
-version: int8 = 1
-hash: sha1?
-index: int16
-data-offset: int32
-file-byte-count: int32
+## Debugging QR code
+
+Qr2clipboard (wmc config, based on scrot and zbarimg)
+```
+xclip -o -selection clipboard -rmlastnl | base64 -d | hexdump -C | less
+```
 
 
 ## Available Scripts

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import QRCode from 'qrcode';
 import { ReduxState } from './redux/store';
 import { setErrorMessage } from './redux/actions';
+import { addQrHeadersToDataSlice, HashedData } from './encoders/QrHeaders';
 
 
 const QRCodeImage = (props: Props) => {
@@ -10,7 +11,7 @@ const QRCodeImage = (props: Props) => {
 
     useEffect(() => {
         // Side-effect uses `prop` and `state`
-        let data = props.file_bytes;
+        let data = props.result_bytes;
         console.log("data", data);
         if (data) {
             let error_message = "";
@@ -18,11 +19,15 @@ const QRCodeImage = (props: Props) => {
                 error_message = "TODO implement qr splitting. The currect code is capped";
                 data = data.slice(0, 2000);
             }
-            const qr_data = [{
-                data: data,
-                mode: 'byte'
-            }]
+            const hashed_data = new HashedData(data);
+            const data_with_headers = addQrHeadersToDataSlice(hashed_data, 0, data.length);
+            console.debug("Data with header", data_with_headers);
+
             const options = { errorCorrectionLevel: props.error_correction_level };;
+            const qr_data = [{
+                data: data_with_headers,
+                mode: 'byte'
+            }];
             //@ts-ignore
             QRCode.toDataURL(qr_data as any, options, (error, url) => {
                 if (error) {
@@ -35,7 +40,7 @@ const QRCodeImage = (props: Props) => {
                 }
             });
         }
-    }, [props.file_bytes, props.error_correction_level, setDataUrl]);
+    }, [props.result_bytes, props.error_correction_level, setDataUrl]);
     if (data_url) {
         return <a href={data_url} target="_blank" rel="noreferrer" title="Open image in new tab">
             <img src={data_url} alt="Click this QR code to open it in a new tab" />
@@ -46,14 +51,14 @@ const QRCodeImage = (props: Props) => {
 };
 
 interface Props {
-    file_bytes: Uint8Array | null,
+    result_bytes: Uint8Array | null,
     error_correction_level: string,
 }
 
 const mapStateToProps = (state: ReduxState, ownProps: any) => {
     return {
         ...ownProps,
-        file_bytes: state.file_bytes,
+        result_bytes: state.result_bytes,
         error_correction_level: state.error_correction_level,
     };
 };
