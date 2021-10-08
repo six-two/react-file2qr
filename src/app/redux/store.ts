@@ -3,25 +3,25 @@ import { reducer } from './reducer';
 
 export interface ReduxState {
   chunk_size: number,
-  file_name: string | null,
-  file_bytes: Uint8Array | null,
   error_correction_level: string,
   error_message: string | null,
-  qr_data_url: string | null,
   qr_index: number,
-  result_bytes: Uint8Array | null,
+  file: FileState | null,
+}
+
+export interface FileState {
+  name: string,
+  contents: Uint8Array,
+  serialized: Uint8Array,
 }
 
 
 export const FALLBACK_STATE: ReduxState = {
   chunk_size: 2000,
-  file_name: null,
-  file_bytes: null,
   error_correction_level: "L",
   error_message: null,
-  qr_data_url: null,
   qr_index: 0,
-  result_bytes: null,
+  file: null,
 }
 
 let devTools = undefined;

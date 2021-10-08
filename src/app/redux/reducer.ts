@@ -28,18 +28,13 @@ export function reducer(state: ReduxState | undefined, action: Actions.Action): 
       const payload = action.payload as Actions.FilePayload;
       return {
         ...state,
-        file_name: payload.file_name,
-        file_bytes: payload.file_bytes,
-        result_bytes: serializeFile(payload.file_name, payload.file_bytes),
+        file: {
+          name: payload.file_name,
+          contents: payload.file_bytes,
+          serialized: serializeFile(payload.file_name, payload.file_bytes),
+        }
       };
     }
-    case C.SET_QR_DATA_URL: {
-      return {
-        ...state,
-        qr_data_url: action.payload as string,
-      };
-    }
-
     default: {
       console.log("Unknown action", action.type);
       return state;

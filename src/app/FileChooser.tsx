@@ -45,13 +45,13 @@ const QRCodeImage = (props: Props) => {
 };
 
 interface Props {
-    file_name: string | null,
+    file_name?: string,
 }
 
 const mapStateToProps = (state: ReduxState, ownProps: any) => {
     return {
         ...ownProps,
-        file_name: state.file_name,
+        file_name: state.file?.name,
     };
 };
 
