@@ -3,6 +3,7 @@ import '../App.css';
 import QRCodeImage from './QRCodeImage';
 import FileChooser from './FileChooser';
 import ErrorMessage from './ErrorMessage';
+import ChangeIndexButton, {INDEX_NEXT, INDEX_PREV} from './ChangeIndexButton';
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
         <ErrorMessage />
       </div>
       <QRCodeImage />
+      <ChangeIndexButton index={INDEX_PREV} />
+      <ChangeIndexButton index={INDEX_NEXT} />
     </div>
   );
 }

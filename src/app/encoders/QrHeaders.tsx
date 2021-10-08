@@ -26,11 +26,12 @@ const int32ToBytes = (int32: number) => {
     return [getByte(int32, 3), getByte(int32, 2), getByte(int32, 1), getByte(int32, 0)];
 }
 
-export const addQrHeadersToDataSlice = (data: HashedData, offset: number, length: number) => {
+export const addQrHeadersToDataSlice = (data: HashedData, start_index: number, end_index: number) => {
     const version = [1];
-    const hash = data.hash.values()
-    const offset_bytes = int32ToBytes(offset)
-    const data_bytes = data.data.slice(offset, offset + length);
-    return new Uint8ClampedArray([...version, ...hash, ...offset_bytes, ...data_bytes]);
+    const hash = data.hash.values();
+    const offset_bytes = int32ToBytes(start_index);
+    const data_bytes = data.data.slice(start_index, end_index);
+    const data_with_headers = [...version, ...hash, ...offset_bytes, ...data_bytes];
+    return new Uint8Array(new Uint8ClampedArray(data_with_headers));
 }
 

@@ -42,9 +42,9 @@ export function setFile(file_name: string, file_bytes: Uint8Array) {
   });
 }
 
-export function internal_setQRDataURL(newValue: string) {
+export function setChunkIndex(newValue: number) {
   d({
-    type: C.SET_QR_DATA_URL,
+    type: C.SET_CHUNK_INDEX,
     payload: newValue,
   });
 }
