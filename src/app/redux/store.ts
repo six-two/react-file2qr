@@ -7,6 +7,13 @@ export interface ReduxState {
   error_correction_level: string,
   error_message: string | null,
   file: FileState | null,
+  slide_show: SlideShowState,
+}
+
+export interface SlideShowState {
+  enabled: boolean,
+  // for how many milliseconds a slide should be shown
+  time_in_ms: number,
 }
 
 export interface FileState {
@@ -33,6 +40,10 @@ export const FALLBACK_STATE: ReduxState = {
   error_correction_level: "L",
   error_message: null,
   file: null,
+  slide_show: {
+    enabled: false,
+    time_in_ms: 1000,
+  }
 }
 
 let devTools = undefined;

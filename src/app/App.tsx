@@ -3,7 +3,9 @@ import '../App.css';
 import QRCodeImage from './QRCodeImage';
 import FileChooser from './FileChooser';
 import ErrorMessage from './ErrorMessage';
-import ChangeIndexButton, {INDEX_NEXT, INDEX_PREV} from './ChangeIndexButton';
+import ChangeIndexButton from './ChangeIndexButton';
+import SlideShowButton from './SlideShowButton';
+import { INDEX_NEXT, INDEX_PREV } from './redux/constants';
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
       <QRCodeImage />
       <ChangeIndexButton index={INDEX_PREV} />
       <ChangeIndexButton index={INDEX_NEXT} />
+      <SlideShowButton />
     </div>
   );
 }

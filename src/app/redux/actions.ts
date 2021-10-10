@@ -8,7 +8,7 @@ function d(action: Action) {
 
 export interface Action {
   type: string,
-  payload?: string | number | FilePayload,
+  payload?: string | number | FilePayload | boolean,
 };
 
 export interface FilePayload {
@@ -25,6 +25,10 @@ export function setErrorCorrectionLevel(newValue: string) {
 }
 
 export function setErrorMessage(newValue: string) {
+  if (store.getState().error_message === newValue){
+    console.debug("Error message is the same, skipping action dispatch");
+    return;//Keep by state history clean, which simplifies debugging
+  }
   d({
     type: C.SET_ERROR_MESSAGE,
     payload: newValue,
@@ -49,4 +53,9 @@ export function setChunkIndex(newValue: number) {
   });
 }
 
-
+export function setSlideShowEnabled(newValue: boolean) {
+  d({
+    type: C.SET_SLIDE_SHOW_ENABLED,
+    payload: newValue,
+  });
+}

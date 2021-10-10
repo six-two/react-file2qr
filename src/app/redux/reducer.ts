@@ -25,11 +25,18 @@ export function reducer(state: ReduxState | undefined, action: Actions.Action): 
       };
     }
     case C.SET_CHUNK_INDEX: {
+      let index = action.payload as number;
+      const old_index = state.chunks.index;
+      if (index === C.INDEX_NEXT) {
+        index = (old_index < state.chunks.max_index) ? old_index + 1 : 0;
+      } else if (index === C.INDEX_PREV) {
+        index = (old_index > 0) ? old_index - 1 : state.chunks.max_index;
+      }
       return {
         ...state,
-        chunks:{
+        chunks: {
           ...state.chunks,
-          index: action.payload as number,
+          index: index,
         },
       };
     }
@@ -44,6 +51,15 @@ export function reducer(state: ReduxState | undefined, action: Actions.Action): 
           serialized: new HashedData(serialized),
         }
       });
+    }
+    case C.SET_SLIDE_SHOW_ENABLED: {
+      return {
+        ...state,
+        slide_show: {
+          ...state.slide_show,
+          enabled: action.payload as boolean,
+        },
+      };
     }
     default: {
       console.log("Unknown action", action.type);

@@ -19,7 +19,6 @@ const generateQRCode = (data: Uint8Array | undefined, options: any, setDataUrl: 
             setDataUrl("");
             setErrorMessage(error.toString());
         } else {
-            console.log("Data URL", url);
             setDataUrl(url);
             setErrorMessage("");
         }
@@ -45,9 +44,12 @@ const QRCodeImage = (props: Props) => {
 
     }, [props.file_export_bytes, props.error_correction_level, props.chunks, setDataUrl]);
     if (data_url) {
-        return <a href={data_url} target="_blank" rel="noreferrer" title="Open image in new tab">
-            <img src={data_url} alt="Click this QR code to open it in a new tab" />
-        </a>
+        return <div>
+            <h2>Code {props.chunks.index + 1} of {props.chunks.max_index + 1}</h2>
+            <a href={data_url} target="_blank" rel="noreferrer" title="Open image in new tab">
+                <img src={data_url} alt="Click this QR code to open it in a new tab" />
+            </a>
+        </div>
     } else {
         return null;
     }
