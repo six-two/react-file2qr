@@ -34,21 +34,25 @@ class Chunk(NamedTuple):
         else:
             return self.offset < other.offset
 
-# not very robust against forged qr codes, but who cares :)
+# not very robust against forged qr codes, but who cares :) I mean it is hashed, so I should be fine
 class DataReassembly:
     def __init__(self, data_hash: bytes):
         self.chunks = []
         self.hash = data_hash
 
-    def add_chunk(self, new_offset: int, new_data: bytes) -> None:
+    def add_chunk(self, new_offset: int, new_data: bytes) -> bool:
+        """Returns True, if the internal state was changed"""
         new_chunk = Chunk(new_offset, new_data)
         i = bisect.bisect_left(self.chunks, new_offset)
         if i != len(self.chunks) and self.chunks[i].offset == new_offset:
             old = self.chunks[i]
-            if len(new_chunk.data) >= len(old.data):
+            if old.data == new_chunk.data:
+                return False
+            elif len(new_chunk.data) >= len(old.data):
                 self.chunks[i] = new_chunk
         else:
             bisect.insort(self.chunks, new_chunk)
+        return True
 
     def get_data_if_complete(self) -> Optional[bytes]:
         data = b""
@@ -65,17 +69,12 @@ class DataReassembly:
         digest = hashlib.sha1()
         digest.update(data)
         hashed_data = digest.digest()
-        # print("=== Hashes ===")
-        # print(hashed_data)
-        # print(self.hash)
 
         return data if hashed_data == self.hash else None
 
 
 def bytes_to_int32(data: bytes) -> int:
     value = 0
-    # print("data:", data.hex())
-    # print(len(data))
     value += data[0] << 24
     value += data[1] << 16
     value += data[2] << 8
@@ -85,7 +84,6 @@ def bytes_to_int32(data: bytes) -> int:
 
 def parse_v1_frame(payload: bytes) -> Optional[V1Frame]:
     i = 0
-    # print("payload", payload[:40].hex()+"...")
     version, i = payload[i], i + 1
     if version != 1:
         return None
@@ -105,28 +103,12 @@ def parse_qr(input_file: str) -> list[bytes]:
         notify("No screenshot was taken", "Error")
         sys.exit(1)
 
-    # try:
-    #     output = subprocess.check_output(["zbarimg", "--quiet", "--xml", input_file])
-    # except subprocess.CalledProcessError as e:
-    #     print(e)
-    #     output = e.output
-    # print(output)
-    # output = output.decode("utf-8", errors="ignore")
-    # print(output)
-    # parser = minidom.parseString(output)
-    # tag_list = parser.getElementsByTagName('data')
-    # data_list = [tag.firstChild.wholeText.strip() for tag in tag_list]
-    # return data_list
-
     img = Image.open(input_file)
     decoded = pyzbar.decode(img, symbols=[pyzbar.ZBarSymbol.QRCODE])
     results = []
     for code in decoded:
-        # print(code)
         x, y, w, h = code.rect
-        # print(x, y, w, h)
         cropped = img.crop((x, y, x+w, y+h))
-        # cropped.show()
         # code.data is buggy, since it is null terminated. So i need to extract the QR codes and decode them individualy
         cropped.save(QR_FILE)
         try:
@@ -145,14 +127,11 @@ def notify(message: str, title: str) -> None:
 def take_screenshot(output_file: str) -> None:
     if os.path.exists(output_file):
         os.remove(output_file)
-    print("Taking screenshot")
+    # print("Taking screenshot")
     subprocess.check_call(["scrot", output_file])
 
 
 def transfer_finished(data: bytes) -> None:
-    print("Transfer finished")
-    # print(data.hex())
-
     i = 0
     # read file name length
     name_length = bytes_to_int32(data[i:i+4])
@@ -171,12 +150,13 @@ def transfer_finished(data: bytes) -> None:
         print(f"Length mismatch: expected {i}, got {len(data)}")
 
     name = name.decode("utf-8")
-    print("Name:", name)
-    print("Contents:", contents.hex())
 
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-    with open(os.path.join(OUTPUT_FOLDER, name), "wb") as f:
+    out_file = os.path.join(OUTPUT_FOLDER, name)
+    with open(out_file, "wb") as f:
         f.write(contents)
+    
+    print(f"Received: {out_file} ({round(len(contents) / 1024.0, 2)} KiB)")
 
 
 def parse_args() -> Any:
@@ -186,7 +166,7 @@ def parse_args() -> Any:
 
 def main():
     args = parse_args()
-    chunks = {} # hash -> list[data]  
+    chunks: dict[bytes,DataReassembly] = {} # hash -> DataReassembly
     sleep = args.sleep / 1000
 
     try:
@@ -194,21 +174,20 @@ def main():
             start = time.monotonic()
             take_screenshot(QR_FILE)
             data_list = parse_qr(QR_FILE)
-            # print(data_list)
             for data in data_list:
                 parsed = parse_v1_frame(data)
                 if parsed:
-                    # print(parsed._replace(data="[...]"))
-                    hash = parsed.hash.hex()
                     chunk = chunks.get(parsed.hash)
                     if not chunk:
                         chunk = DataReassembly(parsed.hash)
                         chunks[parsed.hash] = chunk
-                    chunk.add_chunk(parsed.offset, parsed.data)
-                    print(parsed.hash.hex(), parsed.offset)
+                    if chunk.add_chunk(parsed.offset, parsed.data):
+                        end = parsed.offset + len(parsed.data) - 1
+                        print(f"{parsed.hash.hex()} | {parsed.offset}..{end}")
 
                     try_assemble = chunk.get_data_if_complete()
                     if try_assemble:
+                        print(f"{parsed.hash.hex()} | Transfer finished")
                         transfer_finished(try_assemble)
                         sys.exit(0)
                 else:
