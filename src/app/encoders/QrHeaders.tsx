@@ -1,10 +1,11 @@
 import { createHash } from 'sha1-uint8array';
 
 export const serializeFile = (name: string, content_bytes: Uint8Array) => {
+    const version = 1;
     const name_bytes = new TextEncoder().encode(name);
     const name_length_bytes = int32ToBytes(name_bytes.length);
     const content_length_bytes = int32ToBytes(content_bytes.length);
-    const result = new Uint8ClampedArray([...name_length_bytes, ...name_bytes, ...content_length_bytes, ...content_bytes]);
+    const result = new Uint8ClampedArray([version, ...name_length_bytes, ...name_bytes, ...content_length_bytes, ...content_bytes]);
     return new Uint8Array(result);
 }
 
