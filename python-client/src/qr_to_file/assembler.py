@@ -3,7 +3,7 @@ import hashlib
 import os
 from typing import NamedTuple, Optional
 # local modules
-from protocol import V1Transfer, parse_v1_transfer, parse_v1_frame
+from .protocol import V1Transfer, parse_v1_transfer, parse_v1_frame
 
 
 class Chunk(NamedTuple):

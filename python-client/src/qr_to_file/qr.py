@@ -77,5 +77,5 @@ def generate_screenshot_command(output_file: str, user_selects_area: bool):
             return ["screencapture", "-m", output_file]
     else:
         print("[!] No supported screenshot tool installed.")
-        print("Please install 'scrot' or add your screenshot tool to the 'generate_screenshot_command' function in 'python-client/src/qr.py'")
+        print("Please install 'scrot' or add your screenshot tool to the 'generate_screenshot_command' function in 'python-client/src/qr_to_file/qr.py'")
         raise Exception("Missing external dependency: screenshot tool")

@@ -4,10 +4,23 @@
 
 Not very polished, but it should work on Linux (if you install a supported screenshot tool - currently only `scrot`) and MacOS.
 
-Installation:
-```
-TODO
-```
+1. Clone this repository and open a shell in it.
+2. If you want to have a `qr2file` script for this application, install it with pip:
+    ```bash
+    pip install ./python-client/
+    ```
+
+    Otherwise just install the dependencies:
+    ```bash
+    pip install -r ./python-client/requirements.in
+    ```
+3. Run the client.
+    If installed with pip you can use `qr2file`.
+    You can also always manually call the script:
+    ```bash
+    python ./python-client/src/main.py
+    ```
+
 
 
 ## Debugging QR code
