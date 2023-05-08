@@ -1,6 +1,6 @@
 import os
 import subprocess
-import sys
+from typing import Optional
 # pip install Pillow
 from PIL import Image
 # pip install pyzbar
@@ -24,13 +24,13 @@ def parse_qr(input_file: str) -> list[bytes]:
     else:
         results = []
         for code in qr_code_list:
-            code_contents = extract_and_read_qr_code(code)
+            code_contents = extract_and_read_qr_code(code, img)
             if code_contents:
                 results.append(code_contents)
         return results
 
 
-def extract_and_read_qr_code(code) -> bytes:
+def extract_and_read_qr_code(code, img: Image) -> Optional[bytes]:
     x, y, w, h = code.rect
     cropped = img.crop((x, y, x+w, y+h))
     # code.data is buggy, since it is null terminated. So i need to extract the QR codes and decode them individualy

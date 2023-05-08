@@ -93,5 +93,5 @@ def parse_v1_transfer(payload: bytes, transfer_hash: bytes) -> V1Transfer:
     contents_length = ba.get_int32()
     contents = ba.get_bytes(contents_length)
 
-    name = name.decode("utf-8")
-    return V1Transfer(version, transfer_hash, name, contents)
+    name_str = name.decode("utf-8")
+    return V1Transfer(version, transfer_hash, name_str, contents)

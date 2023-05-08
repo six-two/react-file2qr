@@ -3,7 +3,7 @@ import hashlib
 import os
 from typing import NamedTuple, Optional
 # local modules
-from protocol import V1Transfer, V1Frame, parse_v1_transfer, parse_v1_frame
+from protocol import V1Transfer, parse_v1_transfer, parse_v1_frame
 
 
 class Chunk(NamedTuple):
@@ -16,9 +16,9 @@ class Chunk(NamedTuple):
 # not very robust against forged qr codes, but who cares :) I mean it is hashed, so I should be fine
 class TransferReassembly:
     def __init__(self, data_hash: bytes):
-        self.chunks = []
+        self.chunks: list[Chunk] = []
         self.hash = data_hash
-        self.complete_data = None
+        self.complete_data: Optional[bytes] = None
 
     def add_chunk(self, chunk: Chunk) -> bool:
         """Returns True, if the internal state was changed"""
@@ -34,9 +34,7 @@ class TransferReassembly:
             # no chunk with the same offset exists
             bisect.insort(self.chunks, chunk)
 
-        data = self.get_data_if_complete()
-        if data:
-            self.complete_data = data
+        self.complete_data = self.get_data_if_complete()
         return True
 
     def get_data_if_complete(self) -> Optional[bytes]:
@@ -60,7 +58,7 @@ class TransferReassembly:
 
 class ReassemblyManager:
     def __init__(self, output_folder: str) -> None:
-        self.transfers = {}
+        self.transfers: dict[bytes,TransferReassembly] = {}
         self.output_folder = output_folder
 
     def add_data_chunk(self, data: bytes) -> None:
@@ -73,9 +71,8 @@ class ReassemblyManager:
         chunk = Chunk(frame.transfer_offset, frame.data)
         if transfer.add_chunk(chunk):
             self.on_new_chunk(frame.transfer_hash, chunk)
-            data = transfer.complete_data
-            if data:
-                result = parse_v1_transfer(data, frame.transfer_hash)
+            if transfer.complete_data:
+                result = parse_v1_transfer(transfer.complete_data, frame.transfer_hash)
                 self.on_transfer_completed(result)
 
     def on_new_chunk(self, transfer_hash: bytes, chunk: Chunk) -> None:
