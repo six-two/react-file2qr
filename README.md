@@ -1,33 +1,25 @@
 # Getting Started with Create React App
 
-## TODO
-- Implement protocol
-- Write linux client, that can read QR codes and reconstruct the file
+## Python client
 
-## Protocol idea
+Not very polished, but it should work on Linux (if you install a supported screenshot tool - currently only `scrot`) and MacOS.
 
-Each QR code:
-version: int8
-hash (sha1): uint8array[20]
-offset: int32
+Installation:
+```
+TODO
+```
 
-File payload:
-name: len_array
-contents: len_array
-
-len_array:
-length: int32
-data: uint8array
 
 ## Debugging QR code
 
-Qr2clipboard (wmc config, based on scrot and zbarimg)
+[Qr2clipboard](https://gitlab.com/six-two/bin/-/blob/main/general/copy-qr-code) and then:
 ```
 xclip -o -selection clipboard -rmlastnl | base64 -d | hexdump -C | less
 ```
 
 
-## Available Scripts
+
+## Webapp: Available Scripts
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 In the project directory, you can run:
