@@ -49,8 +49,49 @@ It should work cross platform with any modern browser (but probably not with Int
 
 ## Protocol
 
-Not documented yet, but look at `qrencode-server.py` to understand it.
-If you create a client in a different language feel free to open a PR to add the code to this repo, or at least to link to your project :)
+This section describes how data is encoded during the transfer.
+
+### Transfer
+
+The serialized data used to transmit a whole file is called a `transfer`.
+It has the following structure:
+
+Field | Length in bytes | Description
+---|---|---
+Version | 1 | Always `0x01`, used for future format changes
+Name length | 4 | uint32 (big endian). Length of the following string.
+Name | Value of `Name length` | The name of the file to be transmitted. **MUST NOT** contain path separators
+Contents length | 4 | uint32 (big endian). Length of the following string.
+Contents | Value of `Contents length` | The contents of the file to be transmitted
+
+### Frame
+
+The `transfer` is broken down into chunks called `frame`s that are small enough to fit into QR codes.
+Each QR code will contain exactly one `frame` as content.
+Each `frame` has the following structure:
+
+Field | Length in bytes | Description
+---|---|---
+Version | 1 | Always `0x01`, used for future format changes
+Transfer hash | 20 | SHA1 hash of the entire `transfer` object
+Offset | 4 | uint32 (big endian). Offset of the data in the `transfer`
+Data | All remaining bytes in frame | Slice of the `transfer`
+
+### Design considerations
+
+- QR codes have error correction built in, so we do not need any.
+- `frames` can be sent in any order, duplicate frames do not matter.
+    Thus it may be useful for the client to repeat the whole sequence in case the receiver had problems receiving some of the frames.
+- Each `frame` is tagged with a tranfer hash (basically an UID), so that you can receive multiple `transfer`s at once.
+- Receivers **MUST** check the transfer's file name for path separators and reject the transfer if found.
+    Otherwise there may be path traversal vulnerabilities.
+    For example a file name of `../../../../../home/USERNAME/.zshrc` could otherwise be used to replace the shell configuration file and gain code execution.
+- Receivers should probably verify the transfer hash when the transfer is done, to make sure that the file was correctly received.
+
+### Example
+
+To see an example implementation of a sender, you can look at `qrencode-server.py`.
+If you create a receiver/sender in a different language feel free to open a PR to add the code to this repo, or at least to link to your project :)
 
 ## Debugging QR code
 
