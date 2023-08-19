@@ -34,7 +34,7 @@ xclip -o -selection clipboard -rmlastnl | base64 -d | hexdump -C | less
 
 ## Webapp: Available Scripts
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The project in `react-server` was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 In the project directory, you can run:
 
 ### `npm start`
