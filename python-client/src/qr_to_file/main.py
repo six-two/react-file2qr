@@ -7,7 +7,7 @@ import time
 from typing import Any
 # local modules
 from .assembler import ReassemblyManager
-from .qr import take_screenshot, parse_qr
+from .qr import take_screenshot, parse_qr, MissingProgramException
 
 DEFAULT_OUTPUT_FOLDER = "/tmp/qr-receiver/"
 
@@ -45,10 +45,13 @@ def main():
             diff = time.monotonic() - start
             remaining = sleep - diff
             remaining > 0 and time.sleep(remaining)
+    except MissingProgramException as ex:
+        print(f"\n\n[!] MissingProgramException: {ex}")
     except KeyboardInterrupt:
         print("<Ctrl-C>")
     finally:
-        os.remove(qr_file)
+        if os.path.exists(qr_file):
+            os.remove(qr_file)
 
 
 if __name__ == "__main__":

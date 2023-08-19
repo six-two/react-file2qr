@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import subprocess
 import tempfile
@@ -59,23 +60,43 @@ def take_screenshot(output_file: str) -> None:
     if not os.path.exists(output_file):
         raise Exception(f"Command {command} did not produce output file {output_file}")
 
+class MissingProgramException(Exception):
+    pass
+
 
 def generate_screenshot_command(output_file: str, user_selects_area: bool):
     # @SOURE/@SYNC https://gitlab.com/six-two/bin/-/blob/main/general/copy-qr-code
-    if shutil.which("scrot"):
-        # The scrot screenshot tool is installed
-        if user_selects_area:
-            return ["scrot", "-s", output_file]
+    os_type = platform.system()
+    if os_type == "Linux":
+        if os.getenv("XDG_SESSION_TYPE") == "wayland":
+            if shutil.which("grim"):
+                if user_selects_area:
+                    try:
+                        geometry = subprocess.getoutput("slurp")
+                        return ["grim", "-g", geometry, output_file]
+                    except Exception:
+                        raise MissingProgramException("Failed to select region to screenshot using 'slurp'")
+                else:
+                    return ["grim", output_file]
+            else:
+                raise MissingProgramException("No linux wayland screenshotter found. Supported programs: grim")
         else:
-            return ["scrot", output_file]
-    elif shutil.which("screencapture"):
-        # This tool is installed on MacOS by default. You may need to allow 'Terminal' to record your screen (it should pop up a dialog)
-        # Only tested in a single monitor setup, you may need to replace "-m" with something like "-D 2" to select the correct screen
-        if user_selects_area:
-            return ["screencapture", "-i", "-J", "selection", output_file]
+            if shutil.which("scrot"):
+                if user_selects_area:
+                    return ["scrot", "-s", output_file]
+                else:
+                    return ["scrot", output_file]
+            else:
+                raise MissingProgramException("No linux X11 screenshotter found. Supported programs: scrot")
+    elif os_type == "Darwin":
+        if shutil.which("screencapture"):
+            # This tool is installed on MacOS by default. You may need to allow 'Terminal' to record your screen (it should pop up a dialog)
+            # Only tested in a single monitor setup, you may need to replace "-m" with something like "-D 2" to select the correct screen
+            if user_selects_area:
+                return ["screencapture", "-i", "-J", "selection", output_file]
+            else:
+                return ["screencapture", "-m", output_file]
         else:
-            return ["screencapture", "-m", output_file]
+            raise MissingProgramException("No MacOS screenshotter found. Supported programs: screencapture")
     else:
-        print("[!] No supported screenshot tool installed.")
-        print("Please install 'scrot' or add your screenshot tool to the 'generate_screenshot_command' function in 'python-client/src/qr_to_file/qr.py'")
-        raise Exception("Missing external dependency: screenshot tool")
+        raise MissingProgramException(f"Unknown system platform '{os_type}', expected 'Linux' or 'Darwin' (MacOS)")
