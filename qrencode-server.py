@@ -30,7 +30,7 @@ def transfer(data: bytes, name: str, chunk_size: int, delay_seconds: float) -> N
         # -t ANSI256UTF8: smallest pixel representation
         # -m 2: smaller margin -> takes up less space
         # -8: needed for binary data to work
-        subprocess.run(["qrencode", "-t", "ANSI256UTF8", "-m", "2", "-8"], input=frame_data) # did not work with \x00 bytes
+        subprocess.run(["qrencode", "-t", "ANSI256UTF8", "-m", "2", "-8"], input=frame_data)
         # wait before showing the next code
         time.sleep(delay_seconds)
 

@@ -38,6 +38,9 @@ Usage:
 
 Use the `--help` flag to see some performance tweaking options (QR code size and delay between codes).
 
+`qrencode-server.min.py` is a minified version that can be faster transmitted to the target system via autotype / manually typing it.
+See the usage by calling it without parameters.
+
 
 ## React server
 
