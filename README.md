@@ -1,8 +1,12 @@
-# Getting Started with Create React App
+# File2QR
+
+Tools for transfering a file via QR codes.
+There is a server (program that creates QR codes) and a client (parses and reassembles QR codes).
+They speak a common protocol, so you could for example use the React Server with the Python client
 
 ## Python client
 
-Not very polished, but it should work on Linux (if you install a supported screenshot tool - currently only `scrot`) and MacOS.
+It should work on Linux (if you install a supported screenshot tool - currently only `scrot` / `grim`) and MacOS.
 
 1. Clone this repository and open a shell in it.
 2. If you want to have a `qr2file` script for this application, install it with pip:
@@ -18,10 +22,32 @@ Not very polished, but it should work on Linux (if you install a supported scree
     If installed with pip you can use `qr2file`.
     You can also always manually call the script:
     ```bash
-    python ./python-client/src/main.py
+    python ./python-client/src/main.py -o ~/Downloads
     ```
 
+## Python server
 
+A small single file tools, so that you could transfer it via `xdotool type`.
+It should work on Linux systems.
+It relies on `qrencode` for actually creating the QR codes, so you may need to install that tool.
+
+Usage:
+```bash
+./qrencode-server.py /path/to/file
+```
+
+Use the `--help` flag to see some performance tweaking options (QR code size and delay between codes).
+
+
+## React server
+
+You can either self host it, or use the version deployed via Vercel at [react-file2qr.vercel.app](https://react-file2qr.vercel.app/?lang=en).
+It should work cross platform with any modern browser (but probably not with Internet Explorer).
+
+## Protocol
+
+Not documented yet, but look at `qrencode-server.py` to understand it.
+If you create a client in a different language feel free to open a PR to add the code to this repo, or at least to link to your project :)
 
 ## Debugging QR code
 
