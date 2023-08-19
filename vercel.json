@@ -1,4 +1,5 @@
 {
+    "installCommand": "cd react-sender && npm install",
     "buildCommand": "cd react-sender && npm run build",
     "outputDirectory": "react-sender/build",
     "github": {

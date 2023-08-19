@@ -189,21 +189,11 @@ cython_debug/
 
 ########## My stuff ###########
 
-# Output folder of ./build-docs.sh
-public/
-
-# Temproary files from build process
-mkdocs-theme.yml
-
 # IDE configuration
 .vscode/
 
 # JavaScript modules
 node_modules/
-
-# Output of Typescript build
-src/mkdocs_placeholder_plugin/assets/placeholder.min.js*
-typescript/javascript
 
 # MacOS garbage
 .DS_Store
