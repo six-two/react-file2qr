@@ -4,7 +4,7 @@ Tools for transfering a file via QR codes.
 There is a server (program that creates QR codes) and a client (parses and reassembles QR codes).
 They speak a common protocol, so you could for example use the React Server with the Python client
 
-## Python client
+## Python
 
 It should work on Linux (if you install a supported screenshot tool - currently only `scrot` / `grim`) and MacOS.
 
@@ -18,22 +18,33 @@ It should work on Linux (if you install a supported screenshot tool - currently 
     ```bash
     pip install -r ./python-client/requirements.in
     ```
-3. Run the client.
-    If installed with pip you can use `qr2file`.
-    You can also always manually call the script:
-    ```bash
-    python ./python-client/src/main.py -o ~/Downloads
-    ```
 
-## Python server
+### Client 
 
-A small single file tools, so that you could transfer it via `xdotool type`.
+If installed with pip you can use `qr2file`:
+```bash
+qr2file -o ~/Downloads
+```
+
+You can also always manually call the script:
+```bash
+python3 ./python-client/src/main.py -o ~/Downloads
+```
+
+### Server
+
+A small single file tools, so that you could easily transfer to an target system.
 It should work on Linux systems.
 It relies on `qrencode` for actually creating the QR codes, so you may need to install that tool.
 
 Usage:
 ```bash
-./qrencode-server.py /path/to/file
+file2qr /path/to/file /path/to/another-file
+```
+
+Or if you did not install it:
+```bash
+python3 ./python-client/src/file_to_qr/main.py /path/to/file /path/to/another-file
 ```
 
 Use the `--help` flag to see some performance tweaking options (QR code size and delay between codes).
@@ -86,6 +97,8 @@ Data | All remaining bytes in frame | Slice of the `transfer`
 - Receivers **MUST** check the transfer's file name for path separators and reject the transfer if found.
     Otherwise there may be path traversal vulnerabilities.
     For example a file name of `../../../../../home/USERNAME/.zshrc` could otherwise be used to replace the shell configuration file and gain code execution.
+- Receivers **MUST** assume a malicious sender and should not blindly trust the values of length fields sent by the client.
+    In languages like C it **MUST** be ensured, that no buffer overflow will happen, if the declared length is lower than the length of the actual data.
 - Receivers should probably verify the transfer hash when the transfer is done, to make sure that the file was correctly received.
 
 ### Example

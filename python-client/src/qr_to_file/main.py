@@ -30,8 +30,8 @@ def main():
         exit(1)
     assembler = ReassemblyManager(args.output_dir)
     sleep = args.sleep / 1000
-    print(f"[*] Taking screenshots every {sleep} seconds. Open the web app at https://react-file2qr.vercel.app/ and start the QR slide show.")
-    print(f"[*] Hint: You will see output, when a new QR code containing a file segment is parsed")
+    print(f"[*] Taking screenshots every {sleep} seconds. Open the web app at https://react-file2qr.vercel.app/ and start the QR slide show (or use qr2file). Exit receiving with Ctrl-C")
+    print("[*] Hint: You will see output, when a new QR code containing a file segment is parsed")
     print("\n----------------- Hash ----------------- | --- Bytes received ---")
 
     _, qr_file = tempfile.mkstemp()

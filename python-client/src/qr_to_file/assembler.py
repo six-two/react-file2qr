@@ -49,10 +49,7 @@ class TransferReassembly:
             else:
                 break
 
-        digest = hashlib.sha1()
-        digest.update(data)
-        hashed_data = digest.digest()
-
+        hashed_data = hashlib.sha1(data).digest()
         return data if hashed_data == self.hash else None
 
 
@@ -83,9 +80,10 @@ class ReassemblyManager:
         print(f"{transfer.transfer_hash.hex()} | Transfer finished: {transfer.name}")
         os.makedirs(self.output_folder, exist_ok=True)
 
-        if "/" in transfer.name:
+        # The last check is just in case there is a system that has really strange path separators
+        if "/" in transfer.name or "\\" in transfer.name or os.path.sep in transfer.name:
             # Path traversal detection
-            print(f"[!] Security warning: Name '{transfer.name}' contains a '/'. This may be an attack!")
+            print(f"[!] Security warning: Name '{transfer.name}' contains a path separator. This may be an attack! The transfer has been discarded")
         else:
             out_file = os.path.join(self.output_folder, transfer.name)
             with open(out_file, "wb") as f:
