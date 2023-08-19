@@ -1,0 +1,7 @@
+{
+    "buildCommand": "cd react-sender && npm run build",
+    "outputDirectory": "react-sender/build",
+    "github": {
+        "silent": true
+    }
+}
