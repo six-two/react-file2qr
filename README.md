@@ -2,7 +2,14 @@
 
 Tools for transfering a file via QR codes.
 There is a sender (program that creates QR codes) and a receiver (parses and reassembles QR codes).
-They speak a common protocol, so you could for example use the React Server with the Python client
+They speak a common protocol, so you could for example use the React sender with the Python receiver.
+
+Example usecases:
+
+- (Auto) type the python client (`qrencode-server.min.py`) into a Kali VM that has not internet access and can only be accessed via restrictive means (remote access with no clipboard sharing, shared folders, etc).
+    Then you can use the sender to exfiltrate results back to your computer.
+- Generate QR codes for some important file (GPG key / password database), print them and store them in a safe place as an offline non-digital backup.
+    Just make sure to encrypt the data beforehand if it is sensitive.
 
 ## Python
 
@@ -52,6 +59,11 @@ file2qr /path/to/file /path/to/another-file
 Or if you did not install it:
 ```bash
 python3 ./python-client/src/file_to_qr/main.py /path/to/file /path/to/another-file
+```
+
+Generate QR codes as image files:
+```bash
+file2qr -o ~/Documents/qr-codes-for-file/ /path/to/file
 ```
 
 Use the `--help` flag to see some performance tweaking options (QR code size and delay between codes).
