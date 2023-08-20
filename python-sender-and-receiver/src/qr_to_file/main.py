@@ -21,16 +21,11 @@ def parse_args() -> Any:
     ap = argparse.ArgumentParser()
     ap.add_argument("-s", "--sleep", type=int, help="the number of millis to sleep between screenshots", default=900)
     ap.add_argument("-o", "--output-dir", default=DEFAULT_OUTPUT_FOLDER, help=f"the folder to write the results to (default: {DEFAULT_OUTPUT_FOLDER})")
+    ap.add_argument("-i", "--images", nargs="+", help="instead of taking regular screenshots, read all the given image files")
     return ap.parse_args()
 
-def main():
-    args = parse_args()
-    if not os.path.isdir(args.output_dir):
-        print(f"Output directory '{args.output_dir}' is not a directory or does not exist")
-        exit(1)
-    assembler = ReassemblyManager(args.output_dir)
-    sleep = args.sleep / 1000
-    print(f"[*] Taking screenshots every {sleep} seconds. Open the web app at https://react-file2qr.vercel.app/ and start the QR slide show (or use qr2file). Exit receiving with Ctrl-C")
+def main_loop_with_screenshots(assembler: ReassemblyManager, sleep_seconds: float):
+    print(f"[*] Taking screenshots every {sleep_seconds} seconds. Open the web app at https://react-file2qr.vercel.app/ and start the QR slide show (or use qr2file). Exit receiving with Ctrl-C")
     print("[*] Hint: You will see output, when a new QR code containing a file segment is parsed")
     print("\n----------------- Hash ----------------- | --- Bytes received ---")
 
@@ -43,7 +38,7 @@ def main():
             for data in data_list:
                 assembler.add_data_chunk(data)
             diff = time.monotonic() - start
-            remaining = sleep - diff
+            remaining = sleep_seconds - diff
             remaining > 0 and time.sleep(remaining)
     except MissingProgramException as ex:
         print(f"\n\n[!] MissingProgramException: {ex}")
@@ -52,6 +47,36 @@ def main():
     finally:
         if os.path.exists(qr_file):
             os.remove(qr_file)
+
+
+def main_loop_with_images(assembler: ReassemblyManager, image_file_list: list[str]):
+    print(f"[*] Parsing {len(image_file_list)} image files")
+    print("[*] Hint: You will see output, when a new QR code containing a file segment is parsed")
+    print("\n----------------- Hash ----------------- | --- Bytes received ---")
+
+    for image_file in image_file_list:
+        if not os.path.exists(image_file):
+            print(f"[-] File '{image_file}' does not exist")
+        else:
+            data_list = parse_qr(image_file)
+            for data in data_list:
+                assembler.add_data_chunk(data)
+
+    print("[*] Done - all image files were processed")
+
+
+def main():
+    args = parse_args()
+    if not os.path.isdir(args.output_dir):
+        print(f"Output directory '{args.output_dir}' is not a directory or does not exist")
+        exit(1)
+    assembler = ReassemblyManager(args.output_dir)
+    if args.images:
+        image_file_list = args.images if type(args.images) == list else [args.images]
+        main_loop_with_images(assembler, image_file_list)
+    else:
+        sleep_seconds = args.sleep / 1000
+        main_loop_with_screenshots(assembler, sleep_seconds)
 
 
 if __name__ == "__main__":

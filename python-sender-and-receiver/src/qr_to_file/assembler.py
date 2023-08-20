@@ -89,4 +89,4 @@ class ReassemblyManager:
             with open(out_file, "wb") as f:
                 f.write(transfer.contents)
             
-            print(f"Received file: {out_file} ({round(len(transfer.contents) / 1024.0, 2)} KiB)")
+            print(f"[*] Received file: {out_file} ({round(len(transfer.contents) / 1024.0, 2)} KiB)")
