@@ -15,7 +15,7 @@ def parse_qr(input_file: str) -> list[bytes]:
     if not os.path.exists(input_file):
         raise Exception(f"File '{input_file}' does not exist")
 
-    # Hide the follwoing warning I get when parsing images created with qrencode:
+    # Hide the following warning I get when parsing images created with qrencode:
     #     /usr/lib/python3.11/site-packages/PIL/Image.py:970: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
     #   warnings.warn(
     # @TODO: If someone knows how to fix/avoit it feel free to open an issue/PR

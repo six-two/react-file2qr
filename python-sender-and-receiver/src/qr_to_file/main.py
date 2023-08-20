@@ -22,6 +22,7 @@ def parse_args() -> Any:
     ap.add_argument("-s", "--sleep", type=int, help="the number of millis to sleep between screenshots", default=900)
     ap.add_argument("-o", "--output-dir", default=DEFAULT_OUTPUT_FOLDER, help=f"the folder to write the results to (default: {DEFAULT_OUTPUT_FOLDER})")
     ap.add_argument("-i", "--images", nargs="+", help="instead of taking regular screenshots, read all the given image files")
+    ap.add_argument("-w", "--webcam", metavar="WEBCAM_ID", type=int, help="instead of taking screenshots, take pictures with a webcam. Usually 0 or 1 should be the ID of your first webcam")
     return ap.parse_args()
 
 def main_loop_with_screenshots(assembler: ReassemblyManager, sleep_seconds: float):
@@ -39,7 +40,8 @@ def main_loop_with_screenshots(assembler: ReassemblyManager, sleep_seconds: floa
                 assembler.add_data_chunk(data)
             diff = time.monotonic() - start
             remaining = sleep_seconds - diff
-            remaining > 0 and time.sleep(remaining)
+            if remaining > 0:
+                time.sleep(remaining)
     except MissingProgramException as ex:
         print(f"\n\n[!] MissingProgramException: {ex}")
     except KeyboardInterrupt:
@@ -74,6 +76,11 @@ def main():
     if args.images:
         image_file_list = args.images if type(args.images) == list else [args.images]
         main_loop_with_images(assembler, image_file_list)
+    elif args.webcam is not None:
+        # Conditional import. Only actually import opencv if we want/need to use it
+        from .webcam import main_loop_with_webcam
+        sleep_seconds = args.sleep / 1000
+        main_loop_with_webcam(assembler, sleep_seconds, args.webcam)
     else:
         sleep_seconds = args.sleep / 1000
         main_loop_with_screenshots(assembler, sleep_seconds)
